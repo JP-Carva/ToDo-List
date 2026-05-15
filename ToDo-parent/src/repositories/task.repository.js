@@ -1,0 +1,106 @@
+import { connectDB, sql } from '../database/connection.js';
+
+async function list(userId, { status, search } = {}) {
+  const db = await connectDB();
+  const request = db.request().input('userId', sql.Int, userId);
+
+  let where = 'WHERE t.user_id = @userId';
+
+  if (status) {
+    request.input('status', sql.NVarChar, status);
+    where += ' AND t.status = @status';
+  }
+
+  if (search) {
+    request.input('search', sql.NVarChar, `%${search}%`);
+    where += ' AND (t.title LIKE @search OR t.description LIKE @search)';
+  }
+
+  const result = await request.query(`
+    SELECT
+      t.id,
+      t.title,
+      t.description,
+      t.status,
+      t.priority,
+      t.due_date,
+      t.created_at
+    FROM tasks t
+    ${where}
+    ORDER BY
+      CASE t.status WHEN 'Pendente' THEN 0 ELSE 1 END,
+      CASE t.status WHEN 'Pendente' THEN t.priority ELSE NULL END ASC
+  `);
+
+  return result.recordset;
+}
+
+async function getByUserId(id, userId) {
+  const db = await connectDB();
+  const result = await db.request()
+    .input('id', sql.Int, id)
+    .input('userId', sql.Int, userId)
+    .query('SELECT * FROM tasks WHERE id = @id AND user_id = @userId');
+
+  return result.recordset.length ? result.recordset[0] : null;
+}
+
+async function createTask({ userId, title, description, status, priority, due_date }) {
+  const db = await connectDB();
+  const result = await db.request()
+    .input('userId', sql.Int, userId)
+    .input('title', sql.NVarChar, title)
+    .input('description', sql.NVarChar, description || null)
+    .input('status', sql.NVarChar, status)
+    .input('priority', sql.TinyInt, priority)
+    .input('due_date', sql.Date, due_date || null)
+    .query(`
+      INSERT INTO tasks (user_id, title, description, status, priority, due_date)
+      OUTPUT INSERTED.*
+      VALUES (@userId, @title, @description, @status, @priority, @due_date)
+    `);
+
+  return result.recordset[0];
+}
+
+async function updateTask(id, userId, fields) {
+  const db = await connectDB();
+  const result = await db.request()
+    .input('id', sql.Int, id)
+    .input('userId', sql.Int, userId)
+    .input('title', sql.NVarChar, fields.title ?? null)
+    .input('description', sql.NVarChar, fields.description ?? null)
+    .input('status', sql.NVarChar, fields.status ?? null)
+    .input('priority', sql.TinyInt, fields.priority ?? null)
+    .input('due_date', sql.Date, fields.due_date ?? null)
+    .query(`UPDATE tasks
+      SET
+        title = COALESCE(@title,       title),
+        description = COALESCE(@description, description),
+        status = COALESCE(@status,      status),
+        priority = COALESCE(@priority,    priority),
+        due_date = COALESCE(@due_date,    due_date)
+      OUTPUT INSERTED.*
+      WHERE id = @id AND user_id = @userId
+    `);
+
+  return result.recordset.length ? result.recordset[0] : null;
+}
+
+async function deleteTask(id, userId) {
+  const db = await connectDB();
+  const result = await db.request()
+    .input('id', sql.Int, id)
+    .input('userId', sql.Int, userId)
+    .query('DELETE FROM tasks OUTPUT DELETED.id WHERE id = @id AND user_id = @userId');
+
+  return result.recordset.length ? result.recordset[0] : null;
+}
+
+export {
+  list,
+  getByUserId,
+  createTask,
+  updateTask,
+  deleteTask,
+};

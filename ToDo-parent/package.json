@@ -1,9 +1,11 @@
 {
   "name": "todo-parent",
   "version": "1.0.0",
-  "description": "",
+  "description": "Task Manager API - Node.js + Express + SQL Server",
   "main": "api.js",
   "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,9 +13,12 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3",
     "mssql": "^12.5.3"
   }
 }
