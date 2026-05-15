@@ -3,30 +3,17 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const rawServer = process.env.DB_SERVER || '';
-let server = rawServer;
-const options = {
-    trustServerCertificate: true,
-    encrypt: false
-};
-
-// Support named instance format: SERVER\INSTANCE
-if (rawServer.includes('\\')) {
-    const parts = rawServer.split('\\');
-    server = parts[0];
-    const instanceName = parts.slice(1).join('\\');
-    if (instanceName) options.instanceName = instanceName;
-}
-
-const port = process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : undefined;
-
 const config = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    server,
+    server: process.env.DB_SERVER,
     database: process.env.DB_DATABASE,
-    ...(port ? { port } : {}),
-    options,
+    port: parseInt(process.env.DB_PORT),
+
+    options: {
+        trustServerCertificate: true,
+        encrypt: false
+    },
     pool: {
         max: 10,
         min: 0,
