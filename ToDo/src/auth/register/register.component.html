@@ -1,0 +1,78 @@
+<div class="create-account">
+  <div class="auth-card">
+
+    <form [formGroup]="createAccountForm" (ngSubmit)="submit()" class="container" novalidate>
+
+      <p-button icon="pi pi-arrow-left" [routerLink]="['/login']"
+                styleClass="p-button-rounded p-button-secondary p-button-text back-button p-button-lg"></p-button>
+
+      <div class="text-center mb-8">
+        <div class="brand">
+          <img src="https://www.3coracoes.com.br/wp-content/themes/grupo3coracoes/img/logo.png?x20808" alt="3Corações" title="3Corações" class="img-responsive1">
+          <h1>Criar conta</h1>
+        </div>
+      </div>
+
+      <div class="form-container">
+        <div class="space-y-4">
+          
+          <div class="field">
+            <label class="input-label">Nome de usuário</label>
+            <p-iconfield>
+              <p-inputIcon class="pi pi-user"/>
+              <input type="text" pInputText formControlName="username" placeholder="Seu nome de usuário" required fluid/>
+            </p-iconfield>
+          </div>
+
+          <div class="field">
+            <label class="input-label">E-mail</label>
+            <p-iconfield>
+              <p-inputIcon class="pi pi-envelope"/>
+              <input type="email" pInputText formControlName="email" placeholder="seu@email.com" required fluid/>
+            </p-iconfield>
+          </div>
+
+          <div class="field">
+            <label class="input-label">Senha</label>
+            <p-iconfield>
+              <p-inputIcon class="pi pi-lock"/>
+              <p-password type="password"
+              formControlName="password"
+              placeholder="Mínimo 6 caracteres"
+              [feedback]="false"
+              [toggleMask]="true"
+              required fluid/>
+            </p-iconfield>
+          </div>
+
+          <div class="field">
+            <label class="input-label">Confirmar senha</label>
+            <p-iconfield>
+              <p-inputIcon class="pi pi-lock"/>
+              <p-password type="password"
+              formControlName="passwordRepeat"
+              placeholder="Confirme sua senha"
+              [feedback]="true"
+              [toggleMask]="true"
+              required fluid/>
+            </p-iconfield>
+          </div>
+
+          <button type="submit" class="btn-primary" [disabled]="loading">
+            @if (loading) {
+              <p-progress-spinner strokeWidth="8" fill="transparent" animationDuration=".5s" [style]="{ width: '50px', height: '50px' }" />
+              <p>Cadastrando...</p>
+            } @else {
+              Criar conta
+            }
+          </button>
+        </div>
+
+        <p class="footer-link">
+          Já tem conta?
+          <a routerLink="/login">Entrar</a>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>

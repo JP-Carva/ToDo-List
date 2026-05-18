@@ -1,0 +1,63 @@
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="flex flex-col">
+          <div class="brand">
+            <span class="brand-icon">✓</span>
+            <h1>ToDo List</h1>
+            <a>Organize. Priorize. Conclua.</a>
+          </div>
+
+          <div class="form-container">
+            <form (ngSubmit)="onSubmit()" novalidate>
+
+              <div class="field">
+                <label for="email">Email</label>
+                <p-iconfield>
+                  <p-inputicon class="pi pi-envelope"/>
+                  <input pInputText type="email" name="email"
+                    [(ngModel)]="email"
+                    class="block mb-4"
+                    placeholder="Seu Email"
+                    autocomplete="email"
+                    required
+                    fluid
+                  />
+                </p-iconfield>
+              </div>
+
+            <div class="field">
+              <label for="password">Senha</label>
+              <p-iconfield>
+                <p-inputicon class="pi pi-lock"/>
+                <p-password
+                  name="password"
+                  [(ngModel)]="password"
+                  [toggleMask]="true"
+                  [feedback]="false"
+                  autocomplete="false"
+                  class="block mb-4"
+                  placeholder="Sua senha"
+                  required fluid
+                />
+              </p-iconfield>
+            </div>
+            @if (error) {
+              <div class="error-msg">{{ error }}</div>
+            }
+
+            <button type="submit" class="btn-primary" [disabled]="loading">
+              @if (loading) {
+                <span class="spinner"></span>
+              } @else {
+                <span>Entrar</span>
+              }
+            </button>
+          </form>
+
+          <p class="footer-link">
+            Não tem conta? <a routerLink="/register">Cadastre-se</a>
+          </p>
+        </div>
+      </div>
+    </div>
+</div>
