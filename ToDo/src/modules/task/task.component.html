@@ -3,7 +3,10 @@
     <div class="card">
       <p-menubar>
         <ng-template #start>
-          <img src="https://www.3coracoes.com.br/wp-content/themes/grupo3coracoes/img/logo.png?x20808" alt="3Corações" title="3Corações" style="height: 50px; margin-right: 12px;" />
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <img src="https://www.3coracoes.com.br/wp-content/themes/grupo3coracoes/img/logo.png?x20808" alt="3Corações" title="3Corações" style="height: 50px; margin-right: 12px;" />
+            <span style="font-weight: 600;">Olá {{ (auth.currentUser$ | async)?.username }}! Seja bem vindo</span>
+          </div>
         </ng-template>
 
         <ng-template #end>

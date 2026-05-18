@@ -56,6 +56,8 @@ Swagger: `http://localhost:3000/api/docs`
 
 As rotas de tarefa exigem autenticação (token JWT).
 
+O backend retorna apenas o `token` nas respostas de autenticação. O frontend lê o `username` diretamente do payload do JWT para exibição na interface, sem persistir dados do usuário no storage.
+
 ### Formato de resposta da listagem (paginada)
 
 ```json
@@ -91,3 +93,9 @@ O frontend consome a API via proxy (`ToDo/src/proxy.conf.json`) com `apiUrl: '/a
 
 - Email: `demo_1779116244498@example.com`
 - Senha: `Senha123!`
+
+## Observação de segurança
+
+- O token é armazenado localmente para manter a sessão.
+- Os dados do usuário não são persistidos separadamente no frontend.
+- O nome exibido na saudação é extraído do JWT em memória.

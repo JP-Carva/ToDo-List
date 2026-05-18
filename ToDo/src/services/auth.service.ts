@@ -8,11 +8,10 @@ import { environment } from '../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly TOKEN_KEY = 'tm_token';
-  private readonly USER_KEY  = 'tm_user';
   private readonly TOKEN_EXPIRY_KEY = 'tm_token_expiry';
   private readonly TOKEN_EXPIRY_TIME = 3600000; // 1 hora em milissegundos
 
-  private currentUserSubject = new BehaviorSubject<User | null>(this.storedUser());
+  private currentUserSubject = new BehaviorSubject<User | null>(this.currentUserFromToken());
   currentUser$ = this.currentUserSubject.asObservable();
   private expiryTimer: any;
 
@@ -67,7 +66,6 @@ export class AuthService {
       clearTimeout(this.expiryTimer);
     }
     localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.USER_KEY);
     localStorage.removeItem(this.TOKEN_EXPIRY_KEY);
     this.currentUserSubject.next(null);
   }
@@ -75,10 +73,44 @@ export class AuthService {
   private saveSession(res: AuthResponse): void {
     const expiryTime = new Date().getTime() + this.TOKEN_EXPIRY_TIME;
     localStorage.setItem(this.TOKEN_KEY, res.token);
-    localStorage.setItem(this.USER_KEY, JSON.stringify(res.user));
     localStorage.setItem(this.TOKEN_EXPIRY_KEY, expiryTime.toString());
-    this.currentUserSubject.next(res.user);
+    this.currentUserSubject.next(this.decodeUserFromToken(res.token));
     this.setupTokenExpiry();
+  }
+
+  private decodeUserFromToken(token: string): User | null {
+    try {
+      const parts = token.split('.');
+      if (parts.length < 2) return null;
+
+      const payload = JSON.parse(this.base64UrlDecode(parts[1]));
+      if (!payload?.id || !payload?.email) return null;
+
+      return {
+        id: payload.id,
+        username: payload.username ?? '',
+        email: payload.email,
+        password_hash: '',
+        created_at: '',
+        updated_at: '',
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  private currentUserFromToken(): User | null {
+    const token = localStorage.getItem(this.TOKEN_KEY);
+    if (!token) return null;
+    return this.decodeUserFromToken(token);
+  }
+
+  private base64UrlDecode(value: string): string {
+    const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized.padEnd(normalized.length + (4 - (normalized.length % 4)) % 4, '=');
+    const binary = atob(padded);
+    const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+    return new TextDecoder('utf-8').decode(bytes);
   }
 
   private setupTokenExpiry(): void {
@@ -105,26 +137,5 @@ export class AuthService {
     }
   }
 
-  private setupSessionCleanup(): void {
-    // Limpa a sessão ao fechar a aba/janela
-    // Removido: não limpar o localStorage ao recarregar a página
-    // (manter o token para que o usuário não precise fazer login a cada reload)
-  }
-
-  private storedUser(): User | null {
-    const raw = localStorage.getItem(this.USER_KEY);
-    if (!raw) return null;
-    if (raw === 'undefined' || raw === 'null') {
-      localStorage.removeItem(this.USER_KEY);
-      return null;
-    }
-
-    try {
-      return JSON.parse(raw);
-    } catch (error) {
-      console.error('Erro ao recuperar usuário do storage:', error);
-      localStorage.removeItem(this.USER_KEY);
-      return null;
-    }
-  }
+  private setupSessionCleanup(): void {}
 }
