@@ -1,29 +1,21 @@
 import {
   list as repoList,
-  getByUserId as repoGetById,
   createTask as repoCreateTask,
   updateTask as repoUpdateTask,
   deleteTask as repoDeleteTask,
 } from '../repositories/task.repository.js';
+import Task from '../models/Task.js';
 
-const VALID_STATUSES = ['Pendente' || 'pendente', 'Em Andamento' || 'em andamento', 'Concluída' || 'concluída', 'Em Atraso' || 'em atraso' ];
+const VALID_STATUSES = ['Pendente', 'Em Andamento', 'Concluída', 'Em Atraso' ];
 
 async function list(userId, filters) {
   return await repoList(userId, filters);
 }
 
-async function getByUserId(id, userId) {
-  const task = await repoGetById(id, userId);
-  if (!task) throw { status: 404, message: 'Tarefa não encontrada.' };
-  return task;
-}
-
 async function create(userId, data) {
-  const task = new Task(data);
+  const task = new Task(undefined, userId, data.title, data.description, data.status, data.priority, data.due_date);
 
-  const validations = validateTask(task);
-
-  const priorityNum = validations.validateTaskPriority();
+  const { priorityNum } = validateTask(task, { requireAll: true });
 
   const created = await repoCreateTask({ userId, title: task.title, description: task.description, status: task.status, priority: priorityNum, due_date: task.due_date });
   return created;
@@ -31,34 +23,11 @@ async function create(userId, data) {
 
 
 async function update(id, userId, data) {
-  const { title, status, priority } = data;
-  
-  const existing = await repoGetById(id, userId);
-  if (!existing) throw { status: 404, message: 'Tarefa não encontrada.' };
-  
-  if (title !== undefined) {
-    if (typeof title !== 'string' || title.trim().length === 0) {
-      throw { status: 400, message: 'O título é obrigatório.' };
-    }
-    if (title.length > 255) {
-      throw { status: 400, message: 'Título não pode exceder 255 caracteres.' };
-    }
-  }
+  if (!data || typeof data !== 'object') throw { status: 400, message: 'Payload inválido.' };
 
-  if (status && !VALID_STATUSES.includes(status)) {
-    throw { status: 400, message: 'Status inválido.' };
-  }
+  const task = new Task(id, userId, data.title, data.description, data.status, data.priority, data.due_date);
 
-  if (priority !== undefined) {
-    const priorityNum = parseInt(priority, 10);
-    if (isNaN(priorityNum) || priorityNum < 1 || priorityNum > 5) {
-      throw { status: 400, message: 'Prioridade deve ser entre 1 e 5.' };
-    }
-  }
-  
-  if (data.due_date && isNaN(new Date(data.due_date).getTime())) {
-    throw { status: 400, message: 'Data de vencimento inválida.' };
-  }
+  validateTask(task, { requireAll: false, provided: data });
   
   const updated = await repoUpdateTask(id, userId, data);
   if (!updated) throw { status: 404, message: 'Tarefa não encontrada.' };
@@ -71,19 +40,16 @@ async function remove(id, userId) {
   return deleted;
 }
 
-async function notifications(userId) {
-  await syncOverdueTasks(userId);
-  return await repoNotifications(userId);
-}
+function validateTask(task, opts = {}) {
+  const { requireAll = false, provided = {} } = opts;
 
-function validateTask(task) {
-  validateTitle(task.title);
+  if (requireAll || provided.hasOwnProperty('title')) validateTitle(task.title);
 
-  validateStatus(task.status);
-  
-  validateDueDate(task.due_date);
- 
-  validateTaskPriority(task.priority);
+  if (requireAll || provided.hasOwnProperty('status')) validateStatus(task.status);
+
+  if (requireAll || provided.hasOwnProperty('due_date')) validateDueDate(task.due_date);
+
+  const priorityNum = validateTaskPriority(task.priority, { requireAll, provided });
 
   function validateDueDate(taskDueDate) {
     if (taskDueDate && isNaN(new Date(taskDueDate).getTime())) {
@@ -91,33 +57,32 @@ function validateTask(task) {
     }
   }
 
-  function validateTaskPriority(taskPriority) {
-    const priorityNum = parseInt(taskPriority, 10);
+  function validateTaskPriority(taskPriority, { requireAll: rq, provided: pv }) {
+    const has = pv.hasOwnProperty('priority');
+    const priorityNum = taskPriority === undefined || taskPriority === null ? NaN : parseInt(taskPriority, 10);
 
-    if (taskPriority === undefined) {
-      throw { status: 400, message: 'Prioridade é obrigatória.' };
+    if (rq || has) {
+      if (taskPriority === undefined || taskPriority === null) throw { status: 400, message: 'Prioridade é obrigatória.' };
+      if (isNaN(priorityNum) || priorityNum < 1 || priorityNum > 5) throw { status: 400, message: 'Prioridade deve ser entre 1 e 5.' };
+      return priorityNum;
     }
-    else if (isNaN(priorityNum) || priorityNum < 1 || priorityNum > 5) {
-      throw { status: 400, message: 'Prioridade deve ser entre 1 e 5.' };
-    }
-    return priorityNum;
+
+    if (!isNaN(priorityNum)) return priorityNum;
+
+    return undefined;
   }
 
   function validateStatus(taskStatus) {
-    if (!VALID_STATUSES.includes(taskStatus)) {
-      throw { status: 400, message: 'Status inválido ou não definido.' };
-    }
+    if (taskStatus === undefined || taskStatus === null) throw { status: 400, message: 'Status inválido ou não definido.' };
+    if (!VALID_STATUSES.includes(taskStatus)) throw { status: 400, message: 'Status inválido.' };
   }
 
   function validateTitle(taskTitle) {
-    if (!taskTitle || typeof taskTitle !== 'string' || taskTitle.trim().length === 0) {
-      throw { status: 400, message: 'O título é obrigatório.' };
-    }
-
-    if (taskTitle.length > 255) {
-      throw { status: 400, message: 'Título não pode exceder 255 caracteres.' };
-    }
+    if (!taskTitle || typeof taskTitle !== 'string' || taskTitle.trim().length === 0) throw { status: 400, message: 'O título é obrigatório.' };
+    if (taskTitle.length > 255) throw { status: 400, message: 'Título não pode exceder 255 caracteres.' };
   }
+
+  return { priorityNum };
 }
 
-export { list, getByUserId, create, update, remove, notifications };
+export { list, create, update, remove };

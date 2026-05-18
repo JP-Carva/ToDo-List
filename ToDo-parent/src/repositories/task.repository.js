@@ -1,22 +1,47 @@
 import { connectDB, sql } from '../database/connection.js';
 
-async function list(userId, { status, search } = {}) {
+async function list(userId, { status, search, page = 0, size = 10 } = {}) {
   const db = await connectDB();
-  const request = db.request().input('userId', sql.Int, userId);
 
-  let where = 'WHERE t.user_id = @userId';
+  await db.request()
+    .input('userId', sql.Int, userId)
+    .query(`
+      UPDATE tasks
+      SET status = 'Em Atraso'
+      WHERE user_id = @userId
+        AND status = 'Em Andamento'
+        AND due_date IS NOT NULL
+        AND due_date < CAST(GETDATE() AS date)
+    `);
+
+  const whereClauses = ['t.user_id = @userId'];
+  const inputs = [{ name: 'userId', type: sql.Int, value: userId }];
 
   if (status) {
-    request.input('status', sql.NVarChar, status);
-    where += ' AND t.status = @status';
+    whereClauses.push('t.status = @status');
+    inputs.push({ name: 'status', type: sql.NVarChar, value: status });
   }
 
   if (search) {
-    request.input('search', sql.NVarChar, `%${search}%`);
-    where += ' AND (t.title LIKE @search OR t.description LIKE @search)';
+    whereClauses.push('(t.title LIKE @search OR t.description LIKE @search)');
+    inputs.push({ name: 'search', type: sql.NVarChar, value: `%${search}%` });
   }
 
-  const result = await request.query(`
+  const where = `WHERE ${whereClauses.join(' AND ')}`;
+
+  const countRequest = db.request();
+  for (const i of inputs) countRequest.input(i.name, i.type, i.value);
+  const countResult = await countRequest.query(`SELECT COUNT(1) AS total FROM tasks t ${where}`);
+  const total = countResult.recordset[0]?.total ?? 0;
+
+  const offset = Math.max(0, parseInt(page, 10) || 0) * Math.max(1, parseInt(size, 10) || 10);
+
+  const selectRequest = db.request();
+  for (const i of inputs) selectRequest.input(i.name, i.type, i.value);
+  selectRequest.input('offset', sql.Int, offset);
+  selectRequest.input('size', sql.Int, parseInt(size, 10) || 10);
+
+  const result = await selectRequest.query(`
     SELECT
       t.id,
       t.title,
@@ -24,25 +49,22 @@ async function list(userId, { status, search } = {}) {
       t.status,
       t.priority,
       t.due_date,
-      t.created_at
+      t.created_at,
+      t.updated_at
     FROM tasks t
     ${where}
     ORDER BY
       CASE t.status WHEN 'Pendente' THEN 0 ELSE 1 END,
       CASE t.status WHEN 'Pendente' THEN t.priority ELSE NULL END ASC
+    OFFSET @offset ROWS FETCH NEXT @size ROWS ONLY
   `);
 
-  return result.recordset;
-}
-
-async function getByUserId(id, userId) {
-  const db = await connectDB();
-  const result = await db.request()
-    .input('id', sql.Int, id)
-    .input('userId', sql.Int, userId)
-    .query('SELECT * FROM tasks WHERE id = @id AND user_id = @userId');
-
-  return result.recordset.length ? result.recordset[0] : null;
+  return {
+    content: result.recordset,
+    totalElements: total,
+    page: parseInt(page, 10) || 0,
+    size: parseInt(size, 10) || 10,
+  };
 }
 
 async function createTask({ userId, title, description, status, priority, due_date }) {
@@ -74,15 +96,16 @@ async function updateTask(id, userId, fields) {
     .input('priority', sql.TinyInt, fields.priority ?? null)
     .input('due_date', sql.Date, fields.due_date ?? null)
     .query(`UPDATE tasks
-      SET
-        title = COALESCE(@title,       title),
-        description = COALESCE(@description, description),
-        status = COALESCE(@status,      status),
-        priority = COALESCE(@priority,    priority),
-        due_date = COALESCE(@due_date,    due_date)
-      OUTPUT INSERTED.*
-      WHERE id = @id AND user_id = @userId
-    `);
+            SET
+              title = COALESCE(@title, title),
+              description = COALESCE(@description, description),
+              status = COALESCE(@status, status),
+              priority = COALESCE(@priority, priority),
+              due_date = COALESCE(@due_date, due_date),
+              updated_at = GETDATE()
+            OUTPUT INSERTED.*
+            WHERE id = @id AND user_id = @userId
+          `);
 
   return result.recordset.length ? result.recordset[0] : null;
 }
@@ -99,7 +122,6 @@ async function deleteTask(id, userId) {
 
 export {
   list,
-  getByUserId,
   createTask,
   updateTask,
   deleteTask,

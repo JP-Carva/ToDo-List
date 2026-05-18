@@ -3,10 +3,12 @@ import * as taskService from '../services/task.service.js';
 async function list(req, res) {
   const userId = req.user.id;
   const { status, search } = req.query;
+  const page = parseInt(req.query.page, 10) || 0;
+  const size = parseInt(req.query.size, 10) || 10;
 
   try {
-    const tasks = await taskService.list(userId, { status, search });
-    return res.json(tasks);
+    const paged = await taskService.list(userId, { status, search, page, size });
+    return res.json(paged);
   } catch (err) {
     console.error('list error:', err);
     return res.status(500).json({ message: 'Erro ao listar tarefas.' });
@@ -25,18 +27,18 @@ async function create(req, res) {
   }
 }
 
-// async function update(req, res) {
-//   const { id } = req.params;
-//   const userId = req.user.id;
-//   try {
-//     const updated = await taskService.update(id, userId, req.body);
-//     return res.json(updated);
-//   } catch (err) {
-//     console.error('update error:', err);
-//     const status = err.status || 500;
-//     return res.status(status).json({ message: err.message || 'Erro ao atualizar tarefa.' });
-//   }
-// }
+async function update(req, res) {
+  const { id } = req.params;
+  const userId = req.user.id;
+  try {
+    const updated = await taskService.update(id, userId, req.body);
+    return res.json(updated);
+  } catch (err) {
+    console.error('update error:', err);
+    const status = err.status || 500;
+    return res.status(status).json({ message: err.message || 'Erro ao atualizar tarefa.' });
+  }
+}
 
 async function remove(req, res) {
   const { id } = req.params;
@@ -52,4 +54,4 @@ async function remove(req, res) {
   }
 }
 
-export { list, create };
+export { list, create, update, remove };

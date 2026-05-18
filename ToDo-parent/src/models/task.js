@@ -1,5 +1,5 @@
 class Task {
-  constructor(id, user_id, title, description, status, priority, due_date, created_at) {
+  constructor(id, user_id, title, description, status, priority, due_date, created_at, updated_at) {
     this.id = id;
     this.user_id = user_id;
     this.title = title;
@@ -8,6 +8,7 @@ class Task {
     this.priority = priority;
     this.due_date = due_date;
     this.created_at = created_at;
+    this.updated_at = updated_at;
   }
 
   isOverdue() {
