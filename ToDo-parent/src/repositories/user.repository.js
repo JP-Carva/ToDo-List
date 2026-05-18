@@ -59,16 +59,20 @@ async function create(username, email, hashedPassword) {
 //     }
 // }
 
-// async function deleteById(id) {
-//     try {
-//         const db = await connectDB();
-//         await db.request()
-//             .input('id', sql.Int, id)
-//             .query('DELETE FROM Users WHERE id = @id');
-//     } catch (error) {
-//         console.error('Erro ao deletar usuário por ID:', error);
-//         throw error;
-//     }
-// }
+async function deleteById(id) {
+    try {
+        const db = await connectDB();
+        const result = await db.request()
+            .input('id', sql.Int, id)
+            .query('DELETE FROM Users WHERE id = @id');
+        
+        if (result.rowsAffected[0] === 0) {
+            throw new Error('Usuário não encontrado');
+        }
+    } catch (error) {
+        console.error('Erro ao deletar usuário por ID:', error);
+        throw error;
+    }
+}
 
-export { findByEmail, create };
+export { findByEmail, create, deleteById };
