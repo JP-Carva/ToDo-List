@@ -6,6 +6,8 @@ const PORT = 3000;
 
 connectDB();
 
+app.use((_req, res) => res.status(404).json({ message: 'Rota não encontrada.' }));
+
 app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`API rodando em http://localhost:${PORT}`);
 });

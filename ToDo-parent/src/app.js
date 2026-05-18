@@ -1,17 +1,26 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors'; 
 import authRoutes from './routes/auth.routes.js';
 import taskRoutes from './routes/task.routes.js';
 import { connectDB, sql } from './database/connection.js';
+import { setupSwagger } from './docs/swagger.js';
 
 dotenv.config();
 
 const app = express();
 
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+  credentials: true,
+}));
+
 app.use(express.json());
 
+setupSwagger(app);
+
 app.get('/', (req, res) => {
-    res.send('API funcionando!');
+    res.send('Bem-vindo à API ToDo!');
 });
 
 app.use('/api/auth', authRoutes);
