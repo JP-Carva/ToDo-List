@@ -1,0 +1,18 @@
+# Environment files
+.env
+ToDo/.env
+ToDo-parent/.env
+
+# Presentation/support docs (not part of core project docs)
+APRESENTACAO_PROJETO.md
+ARQUITETURA_DETALHADA.md
+DOCUMENTACAO_COMPLETA.md
+GUIA_DEMONSTRACAO.md
+GUIA_RAPIDO.md
+INDEX_DOCUMENTACAO.md
+
+# Dependencies and build caches
+**/node_modules/
+**/.angular/
+**/dist/
+**/.vite/
