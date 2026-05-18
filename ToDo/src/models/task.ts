@@ -32,4 +32,6 @@ export interface Paginated<T> {
 export interface TaskFiltersPaged extends TaskFilters {
   page?: number;
   size?: number;
+  sortField?: string;
+  sortOrder?: number; // 1 = asc, -1 = desc
 }

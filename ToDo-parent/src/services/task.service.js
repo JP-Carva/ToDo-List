@@ -9,7 +9,13 @@ import Task from '../models/Task.js';
 const VALID_STATUSES = ['Pendente', 'Em Andamento', 'Concluída', 'Em Atraso' ];
 
 async function list(userId, filters) {
-  return await repoList(userId, filters);
+  // normalizar parâmetros de ordenação: espera 'sortField' e 'sortOrder' (asc/desc)
+  const mapped = Object.assign({}, filters);
+  if (filters.sortOrder && typeof filters.sortOrder === 'string') {
+    const order = String(filters.sortOrder).toLowerCase();
+    mapped.sortOrder = order === 'desc' ? 'desc' : 'asc';
+  }
+  return await repoList(userId, mapped);
 }
 
 async function create(userId, data) {

@@ -1,6 +1,6 @@
 import { connectDB, sql } from '../database/connection.js';
 
-async function list(userId, { status, search, page = 0, size = 10 } = {}) {
+async function list(userId, { status, search, page = 0, size = 10, sortField, sortOrder } = {}) {
   const db = await connectDB();
 
   await db.request()
@@ -41,6 +41,15 @@ async function list(userId, { status, search, page = 0, size = 10 } = {}) {
   selectRequest.input('offset', sql.Int, offset);
   selectRequest.input('size', sql.Int, parseInt(size, 10) || 10);
 
+  // permissive whitelist para evitar SQL injection em nomes de colunas
+  const allowedSortFields = new Set(['id','title','status','priority','due_date','created_at','updated_at']);
+  let orderByClause = `\n    ORDER BY\n      CASE t.status WHEN 'Pendente' THEN 0 ELSE 1 END,\n      CASE t.status WHEN 'Pendente' THEN t.priority ELSE NULL END ASC\n`;
+
+  if (sortField && allowedSortFields.has(sortField)) {
+    const order = (String(sortOrder || '').toLowerCase() === 'desc') ? 'DESC' : 'ASC';
+    orderByClause = `\n    ORDER BY t.${sortField} ${order} \n`;
+  }
+
   const result = await selectRequest.query(`
     SELECT
       t.id,
@@ -52,10 +61,7 @@ async function list(userId, { status, search, page = 0, size = 10 } = {}) {
       t.created_at,
       t.updated_at
     FROM tasks t
-    ${where}
-    ORDER BY
-      CASE t.status WHEN 'Pendente' THEN 0 ELSE 1 END,
-      CASE t.status WHEN 'Pendente' THEN t.priority ELSE NULL END ASC
+    ${where}${orderByClause}
     OFFSET @offset ROWS FETCH NEXT @size ROWS ONLY
   `);
 

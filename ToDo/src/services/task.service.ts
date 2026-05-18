@@ -16,6 +16,8 @@ export class TaskService {
     if (filters.search) params = params.set('search', filters.search);
     if (filters.page !== undefined) params = params.set('page', String(filters.page));
     if (filters.size !== undefined) params = params.set('size', String(filters.size));
+    if (filters.sortField) params = params.set('sort', filters.sortField);
+    if (filters.sortOrder !== undefined) params = params.set('order', filters.sortOrder === -1 ? 'desc' : 'asc');
     return this.http.get<Paginated<Task>>(this.base, { params });
   }
 

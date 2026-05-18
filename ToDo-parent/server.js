@@ -1,13 +1,31 @@
-import express from 'express';
 import connectDB from './src/database/connection.js';
 import app from './src/app.js';
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-connectDB();
+async function start() {
+    try {
+        await connectDB();
 
-app.use((_req, res) => res.status(404).json({ message: 'Rota não encontrada.' }));
+        app.use((_req, res) => res.status(404).json({ message: 'Rota não encontrada.' }));
 
-app.listen(PORT, () => {
-    console.log(`API rodando em http://localhost:${PORT}`);
-});
+        const server = app.listen(PORT, () => {
+            console.log(`API rodando em http://localhost:${PORT}`);
+        });
+
+        process.on('unhandledRejection', (reason, promise) => {
+            console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+        });
+
+        process.on('uncaughtException', (err) => {
+            console.error('Uncaught Exception thrown:', err && err.stack ? err.stack : err);
+        });
+
+        return server;
+    } catch (err) {
+        console.error('Erro ao iniciar servidor:', err && err.stack ? err.stack : err);
+        process.exit(1);
+    }
+}
+
+start();

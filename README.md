@@ -49,8 +49,8 @@ Swagger: `http://localhost:3000/api/docs`
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `DELETE /api/auth/profile`
-- `GET /api/task?page=0&size=10&status=Pendente&search=texto`
-- `POST /api/task`
+- `GET /api/task?page=0&size=10&status=Pendente&search=texto&sort=priority&order=desc`
+- `POST /api/task/create`
 - `PUT /api/task/:id`
 - `DELETE /api/task/:id`
 
@@ -67,6 +67,13 @@ O backend retorna apenas o `token` nas respostas de autenticação. O frontend l
 	"page": 0,
 	"size": 10
 }
+```
+
+### Testes backend (Vitest)
+
+```bash
+cd ToDo-parent
+npm test
 ```
 
 ## Frontend (ToDo)

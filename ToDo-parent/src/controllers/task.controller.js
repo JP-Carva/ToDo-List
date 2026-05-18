@@ -2,12 +2,12 @@ import * as taskService from '../services/task.service.js';
 
 async function list(req, res) {
   const userId = req.user.id;
-  const { status, search } = req.query;
+  const { status, search, sort, order } = req.query;
   const page = parseInt(req.query.page, 10) || 0;
   const size = parseInt(req.query.size, 10) || 10;
 
   try {
-    const paged = await taskService.list(userId, { status, search, page, size });
+    const paged = await taskService.list(userId, { status, search, page, size, sortField: sort, sortOrder: order });
     return res.json(paged);
   } catch (err) {
     console.error('list error:', err);

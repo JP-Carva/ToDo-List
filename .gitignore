@@ -17,6 +17,11 @@ INDEX_DOCUMENTACAO.md
 **/dist/
 **/.vite/
 
+# Tests
+**/__tests__/
+**/*.test.js
+**/*.test.ts
+
 # Local IDE files and accidental root lockfile
 **/.vscode/
 /package-lock.json

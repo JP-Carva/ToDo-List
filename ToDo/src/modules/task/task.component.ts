@@ -62,6 +62,8 @@ export class TasksComponent implements OnInit{
   totalRecords = 0;
   searchText = '';
   selectedStatus: TaskStatus | '' = '';
+  sortField: string | undefined = undefined;
+  sortOrder: number | undefined = undefined; // 1 asc, -1 desc
   statusFilterOptions = [
     { label: 'Todos', value: '' },
     { label: TaskStatus.PENDENTE, value: TaskStatus.PENDENTE },
@@ -102,6 +104,8 @@ export class TasksComponent implements OnInit{
       search: this.searchText.trim(),
       page,
       size: this.rows,
+      sortField: this.sortField,
+      sortOrder: this.sortOrder,
     };
 
     this.taskSvc.list(filters).subscribe({
@@ -119,6 +123,9 @@ export class TasksComponent implements OnInit{
   onLazyLoad(event: any): void {
     this.first = event.first;
     this.rows = event.rows;
+    // capturar ordenação enviada pelo componente (Primeng)
+    this.sortField = event.sortField;
+    this.sortOrder = event.sortOrder;
     this.loadTasks();
   }
 
