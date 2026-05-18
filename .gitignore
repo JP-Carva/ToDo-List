@@ -16,3 +16,7 @@ INDEX_DOCUMENTACAO.md
 **/.angular/
 **/dist/
 **/.vite/
+
+# Local IDE files and accidental root lockfile
+**/.vscode/
+/package-lock.json
