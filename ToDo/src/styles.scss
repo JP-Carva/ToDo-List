@@ -1,0 +1,333 @@
+@import "primeicons/primeicons.css";
+
+/* ── Reset & tokens ──────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --text2:      #e8eaf0;
+  --bg:        #e7e0dd;
+  --surface:   #ffffff;
+  --card:      #662708;
+  --border:    #ffffff;
+  --text:      #662708;
+  --muted:     #7a849e;
+  --accent:    #ed8e0f;
+  --accent-h:  #cd1612;
+  --danger:    #da3838;
+  --success:   #3ecf8e;
+  --warn:      #f0a733;
+  --radius:    10px;
+  --radius-lg: 16px;
+  --shadow:    0 4px 30px rgba(82, 40, 4, 0.281);
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Shared auth wrapper ─────────────────────────────── */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 24px;
+}
+
+.task-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+
+.task-card {
+  padding: 40px 36px;
+  width: 100%;
+
+  .brand {
+    text-align: center;
+    margin-bottom: 32px;
+
+    .brand-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px; height: 48px;
+      background: var(--accent);
+      border-radius: 14px;
+      overflow: visible;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    p  { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  }
+}
+
+
+.task-modal-dialog {
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.task-modal-dialog.p-dialog {
+  margin: 0 auto;
+}
+
+.task-modal-dialog .p-dialog-content {
+  padding: 0;
+  background: transparent;
+}
+
+/* keep the native header visible but visually minimal */
+.task-modal-dialog .p-dialog-header {
+  background: transparent;
+  border: none;
+  padding: 0.5rem 0.75rem;
+}
+
+.task-modal-dialog .p-dialog-footer {
+  display: none;
+}
+
+.task-modal-card {
+  max-width: 36rem;
+  width: 100%;
+  padding: 28px 24px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* Ensure overlays appear above dialog and body scroll works */
+.p-overlaypanel,
+.p-dropdown-panel,
+.p-datepicker-panel,
+.p-select-panel {
+  z-index: 2000 !important;
+}
+
+/* Style p-buttons inside task views to match .btn-primary */
+.task-modal-card .p-button,
+.task-card .p-button {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: var(--radius) !important;
+  padding: 10px 18px !important;
+  font-weight: 600 !important;
+}
+
+/* Secondary/text buttons keep minimal style */
+.task-modal-card .p-button.p-button-text,
+.task-card .p-button.p-button-text {
+  background: transparent !important;
+  color: var(--muted) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.task-modal-card .field-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.task-modal-card .p-select,
+.task-modal-card .p-datepicker {
+  width: 100%;
+}
+
+.task-modal-card .modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.task-modal-card .modal-actions .btn-primary,
+.task-modal-card .modal-actions .btn-secondary {
+  width: 100%;
+}
+
+/* Task list visual standardization: only colors/inputs */
+.task-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.task-card .p-button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.task-card .p-button.p-button-danger {
+  color: var(--danger);
+}
+
+.task-card input, .task-card textarea {
+  background: var(--card) !important;
+  color: var(--text2) !important;
+  border-radius: var(--radius) !important;
+}
+
+@media (max-width: 700px) {
+  .task-modal-card {
+    padding: 28px 22px;
+  }
+
+  .task-modal-card .field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .task-modal-card .modal-actions {
+    flex-direction: column;
+  }
+}
+
+.create-account{
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 24px;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--shadow);
+
+  .brand {
+    text-align: center;
+    margin-bottom: 32px;
+
+    .brand-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px; height: 48px;
+      background: var(--accent);
+      border-radius: 14px;
+      font-size: 22px;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    p  { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  }
+}
+
+/* ── Fields ──────────────────────────────────────────── */
+.field {
+  margin-bottom: 16px;
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 6px;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text2);
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color .2s;
+
+    &::placeholder { color: var(--accent); }
+    &:focus { border-color: var(--accent); }
+  }
+
+  textarea { resize: vertical; font-family: inherit; }
+  select   { cursor: pointer; }
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ── Buttons ─────────────────────────────────────────── */
+.btn-primary {
+  width: 100%;
+  padding: 11px 20px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, opacity .2s;
+
+  &:hover:not(:disabled) { background: var(--accent-h); }
+  &:disabled { opacity: .5; cursor: not-allowed; }
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+
+  &:hover { border-color: var(--text); color: var(--text); }
+}
+
+/* ── Misc ─────────────────────────────────────────────── */
+.error-msg {
+  background: rgba(224,82,82,.12);
+  border: 1px solid rgba(224,82,82,.35);
+  color: var(--accent-h);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.footer-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text);
+
+  a { color: var(--accent); text-decoration: none; &:hover { text-decoration: underline; } }
+}
+
+
+:disabled{
+    background: #0b0b14 !important;
+    color: aliceblue !important;
+}
+.p-select.p-disabled {
+    background: #0b0b14 !important;
+  }
+
+@keyframes spin { to { transform: rotate(360deg); } }

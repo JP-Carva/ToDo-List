@@ -1,0 +1,81 @@
+@if (visible) {
+  <ng-container>
+    <div class="task-modal-shell">
+    <p-dialog
+      appendTo="body"
+      [header]="form.value?.id ? 'Editar tarefa' : 'Criar tarefa'"
+      [(visible)]="visible"
+      [modal]="true"
+      (onHide)="handleDialogHide()"
+      [showHeader]="true"
+      [closable]="true"
+      [dismissableMask]="true"
+      [breakpoints]="{ '1199px': '88vw', '575px': '96vw' }"
+      [style]="{ width: 'min(92vw, 36rem)' }"
+      styleClass="task-modal-dialog"
+    >
+      <div class="task-modal-card">
+
+        <form [formGroup]="form" class="form-container" (ngSubmit)="showDialog()" novalidate>
+          <div class="field">
+            <label for="title">Título</label>
+            <input pInputText id="title" type="text" formControlName="title" placeholder="Título da tarefa" fluid />
+          </div>
+
+          <div class="field">
+            <label for="description">Descrição</label>
+            <textarea pTextarea rows="4" id="description" formControlName="description" placeholder="Detalhes opcionais..." fluid></textarea>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="status">Status</label>
+              <p-select
+                id="status"
+                formControlName="status"
+                [options]="statusOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecione"
+                appendTo="body"
+                fluid
+              ></p-select>
+            </div>
+
+            <div class="field">
+              <label for="priority">Prioridade</label>
+              <p-select
+                id="priority"
+                formControlName="priority"
+                [options]="priorityOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecione"
+                appendTo="body"
+                fluid
+              >
+                <ng-template pTemplate="selectedItem" let-value>
+                  <span>{{ value?.label || value }}</span>
+                </ng-template>
+                <ng-template pTemplate="item" let-option>
+                  <div>{{ option.label }}</div>
+                </ng-template>
+              </p-select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="due_date">Data de vencimento</label>
+            <p-datepicker id="due_date" formControlName="due_date" dateFormat="dd/mm/yy" appendTo="body" fluid></p-datepicker>
+          </div>
+
+          <div class="modal-actions">
+            <button pButton type="button" class="btn-secondary" label="Cancelar" (click)="onCancel()"></button>
+            <button pButton type="submit" class="btn-primary" label="Salvar"></button>
+          </div>
+        </form>
+      </div>
+    </p-dialog>
+  </div>
+</ng-container>
+}
