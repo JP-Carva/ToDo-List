@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "todo-parent",
   "version": "1.0.0",
   "description": "Task Manager API - Node.js + Express + SQL Server",

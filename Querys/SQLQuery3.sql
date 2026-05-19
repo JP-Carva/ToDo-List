@@ -18,7 +18,7 @@ CREATE TABLE tasks (
 	description TEXT,
 	status VARCHAR(50) NOT NULL,
 	priority TINYINT NOT NULL,
-	due_date DATETIME,
+	due_date DATETIME NOT NULL,
 	created_at DATETIME DEFAULT GETDATE(),
 	updated_at DATETIME DEFAULT GETDATE(),
 

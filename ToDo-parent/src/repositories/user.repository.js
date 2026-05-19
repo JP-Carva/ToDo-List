@@ -14,20 +14,6 @@ async function findByEmail(email) {
     }
 }
 
-// async function findById(id) {
-//     try {
-//         const db = await connectDB();
-//         const result = await db.request()
-//             .input('id', sql.Int, id)
-//             .query('SELECT * FROM Users WHERE id = @id');
-
-//         return result.recordset.length > 0 ? result.recordset[0] : null;
-//     } catch (error) {
-//         console.error('Erro ao buscar usuário por ID:', error);
-//         throw error;
-//     }
-// }
-
 async function create(username, email, hashedPassword) {
     try {
         const db = await connectDB();
@@ -43,21 +29,6 @@ async function create(username, email, hashedPassword) {
         throw error;
     }
 }
-
-// async function update(id, name, email, hashedPassword) {
-//     try {
-//         const db = await connectDB();
-//         await db.request()
-//             .input('id', sql.Int, id)
-//             .input('name', sql.VarChar, name)
-//             .input('email', sql.VarChar, email)
-//             .input('password', sql.VarChar, hashedPassword)
-//             .query('UPDATE Users SET name = @name, email = @email, password = @password WHERE id = @id');
-//     } catch (error) {
-//         console.error('Erro ao atualizar usuário:', error);
-//         throw error;
-//     }
-// }
 
 async function deleteById(id) {
     try {

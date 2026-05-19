@@ -41,7 +41,6 @@ async function list(userId, { status, search, page = 0, size = 10, sortField, so
   selectRequest.input('offset', sql.Int, offset);
   selectRequest.input('size', sql.Int, parseInt(size, 10) || 10);
 
-  // permissive whitelist para evitar SQL injection em nomes de colunas
   const allowedSortFields = new Set(['id','title','status','priority','due_date','created_at','updated_at']);
   let orderByClause = `\n    ORDER BY\n      CASE t.status WHEN 'Pendente' THEN 0 ELSE 1 END,\n      CASE t.status WHEN 'Pendente' THEN t.priority ELSE NULL END ASC\n`;
 

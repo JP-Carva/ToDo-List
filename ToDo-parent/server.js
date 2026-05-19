@@ -4,6 +4,14 @@ import app from './src/app.js';
 const PORT = process.env.PORT || 3000;
 
 async function start() {
+    process.once('unhandledRejection', (reason, promise) => {
+        console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    });
+
+    process.once('uncaughtException', (err) => {
+        console.error('Uncaught Exception thrown:', err && err.stack ? err.stack : err);
+    });
+
     try {
         await connectDB();
 
@@ -13,13 +21,6 @@ async function start() {
             console.log(`API rodando em http://localhost:${PORT}`);
         });
 
-        process.on('unhandledRejection', (reason, promise) => {
-            console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-        });
-
-        process.on('uncaughtException', (err) => {
-            console.error('Uncaught Exception thrown:', err && err.stack ? err.stack : err);
-        });
 
         return server;
     } catch (err) {
