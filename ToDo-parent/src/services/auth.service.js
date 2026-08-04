@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { findByEmail, create, deleteById } from '../repositories/user.repository.js';
 import { generateToken, verifyToken } from './jwt.service.js';
-import User from '../models/User.js';
+import User from '../models/user.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
