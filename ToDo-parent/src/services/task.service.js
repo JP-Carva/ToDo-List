@@ -4,7 +4,7 @@ import {
   updateTask as repoUpdateTask,
   deleteTask as repoDeleteTask,
 } from '../repositories/task.repository.js';
-import Task from '../models/Task.js';
+import Task from '../models/task.js';
 
 const VALID_STATUSES = ['Pendente', 'Em Andamento', 'Concluída', 'Em Atraso' ];
 
